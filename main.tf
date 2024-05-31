@@ -1,17 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = ">=5.50.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-  profile = "vault-infrastructure"
-}
-
 // ECR
 resource "aws_ecr_repository" "vault_frontend" {
   name                 = "vault-frontend"
@@ -98,27 +84,27 @@ resource "aws_ecs_task_definition" "vault_frontend_production" {
   ])
 }
 
-resource "aws_ecs_service" "vault_frontend_production" {
-  name            = "mongodb"
-  cluster         = aws_ecs_cluster.vault_production.id
-  task_definition = aws_ecs_task_definition.vault_frontend_production.arn
-  desired_count   = 3
+# resource "aws_ecs_service" "vault_frontend_production" {
+#   name            = "mongodb"
+#   cluster         = aws_ecs_cluster.vault_production.id
+#   task_definition = aws_ecs_task_definition.vault_frontend_production.arn
+#   desired_count   = 3
 
-  ordered_placement_strategy {
-    type  = "binpack"
-    field = "cpu"
-  }
+#   ordered_placement_strategy {
+#     type  = "binpack"
+#     field = "cpu"
+#   }
 
-  # load_balancer {
-  #   target_group_arn = aws_lb_target_group.foo.arn
-  #   container_name   = "mongo"
-  #   container_port   = 8080
-  # }
+#   # load_balancer {
+#   #   target_group_arn = aws_lb_target_group.foo.arn
+#   #   container_name   = "mongo"
+#   #   container_port   = 8080
+#   # }
 
-  # placement_constraints {
-  #   type       = "memberOf"
-  #   expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
-  # }
-}
+#   # placement_constraints {
+#   #   type       = "memberOf"
+#   #   expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
+#   # }
+# }
   
   
