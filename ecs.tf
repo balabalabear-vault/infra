@@ -69,7 +69,9 @@ resource "aws_ecs_service" "vault_frontend_production" {
     }
 
     depends_on = [
-        aws_alb_listener.front_end,
+        aws_alb_listener.app_port,
+        aws_alb_listener.http,
+        aws_alb_listener.https,
         aws_iam_role_policy_attachment.ecs_task_execution_role_attach_ecs,
         aws_iam_role_policy_attachment.ecs_task_execution_role_attach_ecr
     ]
