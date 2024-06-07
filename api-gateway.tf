@@ -4,7 +4,7 @@ resource "aws_api_gateway_account" "vault_frontend_api" {
 
 resource "aws_api_gateway_rest_api" "vault_frontend_api" {
   name = "vault-contact-me"
-  body = file("${path.module}/api_definition.json")
+  body = file("${path.module}/definitions/api_definition.json")
 
   endpoint_configuration {
     types = ["EDGE"]
