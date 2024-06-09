@@ -26,13 +26,13 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attach_ecs" {
-    role       = aws_iam_role.ecs_task_execution_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attach_ecr" {
-    role       = aws_iam_role.ecs_task_execution_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
 
 // **************************************
@@ -41,10 +41,10 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attach_ecr" {
 
 resource "aws_iam_role" "cloudwatch" {
   name               = "api_gateway_cloudwatch_global"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.assume_api_gw_role.json
 }
 
-data "aws_iam_policy_document" "assume_role" {
+data "aws_iam_policy_document" "assume_api_gw_role" {
   statement {
     effect = "Allow"
 
@@ -80,6 +80,23 @@ resource "aws_iam_role_policy" "cloudwatch" {
   policy = data.aws_iam_policy_document.cloudwatch.json
 }
 
+// **************************************
+// ********** LAMBDA FUNCTION ***********
+// **************************************
+data "aws_iam_policy_document" "assume_lanbda_role" {
+  statement {
+    effect = "Allow"
 
-  
-  
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "lambda" {
+  name               = "iam_for_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_lanbda_role.json
+}
