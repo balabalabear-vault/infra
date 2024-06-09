@@ -1,5 +1,5 @@
 data "aws_acm_certificate" "tossl" {
-  domain   = "balabalabear.com"
+  domain      = "balabalabear.com"
   types       = ["AMAZON_ISSUED"]
   most_recent = true
 }

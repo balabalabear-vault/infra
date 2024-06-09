@@ -30,8 +30,8 @@ resource "aws_ecs_task_definition" "vault_frontend_production" {
 
   container_definitions = jsonencode([
     {
-      name  = "vault-front-end-production"
-      image = "${aws_ecr_repository.vault_frontend.repository_url}:b2681476e4c44750abf5e4e216a23309a8554ec3"
+      name      = "vault-front-end-production"
+      image     = "${aws_ecr_repository.vault_frontend.repository_url}:b2681476e4c44750abf5e4e216a23309a8554ec3"
       cpu       = 10
       memory    = 256
       essential = true
@@ -40,7 +40,7 @@ resource "aws_ecs_task_definition" "vault_frontend_production" {
           containerPort = 80
           hostPort      = 80
         },
-                {
+        {
           containerPort = 3000
           hostPort      = 3000
         }
@@ -50,34 +50,34 @@ resource "aws_ecs_task_definition" "vault_frontend_production" {
 }
 
 resource "aws_ecs_service" "vault_frontend_production" {
-    name            = "vault-front-end-product"
-    cluster         = aws_ecs_cluster.vault_production.id
-    task_definition = aws_ecs_task_definition.vault_frontend_production.arn
-    desired_count   = var.app_count
-    launch_type     = "FARGATE"
+  name            = "vault-front-end-product"
+  cluster         = aws_ecs_cluster.vault_production.id
+  task_definition = aws_ecs_task_definition.vault_frontend_production.arn
+  desired_count   = var.app_count
+  launch_type     = "FARGATE"
 
-    network_configuration {
-        security_groups  = [aws_security_group.ecs_tasks.id]
-        subnets          = aws_subnet.private.*.id
-        assign_public_ip = true
-    }
+  network_configuration {
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    subnets          = aws_subnet.private.*.id
+    assign_public_ip = true
+  }
 
-    load_balancer {
-        target_group_arn = aws_alb_target_group.app.id
-        container_name   = "vault-front-end-production"
-        container_port   = var.app_port
-    }
+  load_balancer {
+    target_group_arn = aws_alb_target_group.app.id
+    container_name   = "vault-front-end-production"
+    container_port   = var.app_port
+  }
 
-    depends_on = [
-        aws_alb_listener.app_port,
-        aws_alb_listener.http,
-        aws_alb_listener.https,
-        aws_iam_role_policy_attachment.ecs_task_execution_role_attach_ecs,
-        aws_iam_role_policy_attachment.ecs_task_execution_role_attach_ecr
-    ]
+  depends_on = [
+    aws_alb_listener.app_port,
+    aws_alb_listener.http,
+    aws_alb_listener.https,
+    aws_iam_role_policy_attachment.ecs_task_execution_role_attach_ecs,
+    aws_iam_role_policy_attachment.ecs_task_execution_role_attach_ecr
+  ]
 
-      lifecycle {
-            # Reference the security group as a whole or individual attributes like `name`
-            replace_triggered_by = [aws_security_group.ecs_tasks]
-        }
+  lifecycle {
+    # Reference the security group as a whole or individual attributes like `name`
+    replace_triggered_by = [aws_security_group.ecs_tasks]
+  }
 }
