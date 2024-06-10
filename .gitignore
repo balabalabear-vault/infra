@@ -2,7 +2,8 @@
 *.tfstate
 *.tfstate.backup
 *.tfstate.*.backup
-.terraform.tfstate.lock.info
+.terraform.*.*
 
 # Module directory
 .terraform/
+lambdas/*
