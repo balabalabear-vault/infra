@@ -9,28 +9,29 @@
       "get": {
         "x-amazon-apigateway-integration": {
           "httpMethod": "GET",
-          "payloadFormatVersion": "1.0",
           "type": "HTTP_PROXY",
+          "payloadFormatVersion": "1.0",
           "uri": "https://ip-ranges.amazonaws.com/ip-ranges.json"
         }
       }
     },
     "/contacts": {
       "post": {
-        "summary": "Creates a contact-me email.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/schemas/ContactMeMessage"
-              }
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "passthroughBehavior": "WHEN_NO_MATCH",
+          "payloadFormatVersion": "1.0",
+          "uri": "${lambda_uri}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Created",
+          "200": {
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -39,15 +40,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "The specified user ID is invalid (not a number)."
-          },
-          "404": {
-            "description": "A user with the specified ID was not found."
-          },
-          "default": {
-            "description": "Unexpected error"
           }
         }
       }

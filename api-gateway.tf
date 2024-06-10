@@ -4,7 +4,12 @@ resource "aws_api_gateway_account" "vault_frontend_api" {
 
 resource "aws_api_gateway_rest_api" "vault_frontend_api" {
   name = "vault-contact-me"
-  body = file("${path.module}/definitions/api_definition.json")
+  body = templatefile(
+    "${path.module}/definitions/api_definition.tpl",
+    {
+      lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.test_lambda.arn}/invocations"
+    }
+  )
 
   endpoint_configuration {
     types = ["EDGE"]
@@ -21,7 +26,14 @@ resource "aws_api_gateway_deployment" "prod" {
   rest_api_id = aws_api_gateway_rest_api.vault_frontend_api.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.vault_frontend_api.body))
+    redeployment = sha256(
+      templatefile(
+        "${path.module}/definitions/api_definition.tpl",
+        {
+          lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.test_lambda.arn}/invocations"
+        }
+      )
+    )
   }
 
   lifecycle {
