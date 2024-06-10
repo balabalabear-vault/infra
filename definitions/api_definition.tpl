@@ -17,18 +17,18 @@
     },
     "/contacts": {
       "post": {
-        "x-amazon-apigateway-integration": {
-          "httpMethod": "POST",
-          "type": "aws_proxy",
-          "passthroughBehavior": "WHEN_NO_MATCH",
-          "payloadFormatVersion": "1.0",
-          "uri": "${lambda_uri}",
-          "responses": {
-            "default": {
-              "statusCode": "200"
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "Message",
+              "required": "true",
+              "schema": {
+                "$ref": "#/definitions/Message"
+              }
             }
-          }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -41,7 +41,31 @@
               }
             }
           }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "passthroughBehavior": "WHEN_NO_MATCH",
+          "payloadFormatVersion": "1.0",
+          "uri": "${lambda_uri}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
         }
+      }
+    }
+  },
+  "definitions": {
+    "Message": {
+      "type": "object",
+      "properties": {
+        "firstName": {"type": "string"},
+        "lastName": {"type": "string"},
+        "email": {"type": "string"},
+        "subject": {"type": "string"},
+        "message": {"type": "string"}
       }
     }
   }
