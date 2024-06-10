@@ -1,4 +1,10 @@
 # https://medium.com/@olayinkasamuel44/using-terraform-and-fargate-to-create-amazons-ecs-e3308c1b9166
+
+variable "region" {
+  description = "Region of the provider account."
+  default     = "us-east-1"
+}
+
 variable "az_count" {
   description = "Number of AZs to cover in a given region"
   default     = "2"
