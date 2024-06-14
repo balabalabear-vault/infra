@@ -126,3 +126,33 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
+
+data "aws_iam_policy_document" "lambda_dynamodb" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+				"dynamodb:BatchGetItem",
+				"dynamodb:GetItem",
+				"dynamodb:Query",
+				"dynamodb:Scan",
+				"dynamodb:BatchWriteItem",
+				"dynamodb:PutItem",
+				"dynamodb:UpdateItem"
+    ]
+
+		resources = ["arn:aws:dynamodb:*:*:*"]
+  }
+}
+
+resource "aws_iam_policy" "lambda_dynamodb" {
+  name        = "lambda_dynamodb"
+  path        = "/"
+  description = "IAM policy for connecting dynamodb from a lambda"
+  policy      = data.aws_iam_policy_document.lambda_dynamodb.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_dynamodb.arn
+}
