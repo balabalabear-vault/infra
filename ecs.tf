@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "vault_frontend_production" {
   container_definitions = jsonencode([
     {
       name      = "vault-front-end-production"
-      image     = "${aws_ecr_repository.vault_frontend.repository_url}:b2681476e4c44750abf5e4e216a23309a8554ec3"
+      image     = "${aws_ecr_repository.vault_frontend.repository_url}:8c7ab5d4596bb720b407b741c1c2fe908e6dc838"
       cpu       = 10
       memory    = 256
       essential = true
