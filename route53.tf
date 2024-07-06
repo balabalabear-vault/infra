@@ -45,3 +45,22 @@ resource "aws_route53_record" "api" {
     zone_id                = aws_api_gateway_domain_name.api.cloudfront_zone_id
   }
 }
+
+
+# # Example Route53 MX record
+resource "aws_route53_record" "mail_from_mx" {
+  zone_id = data.aws_route53_zone.balabalabear.id
+  name    = aws_ses_domain_mail_from.mail.mail_from_domain
+  type    = "MX"
+  ttl     = "600"
+  records = ["10 feedback-smtp.us-east-1.amazonses.com"]
+}
+
+# Example Route53 TXT record for SPF
+resource "aws_route53_record" "mail_from_txt" {
+  zone_id = data.aws_route53_zone.balabalabear.id
+  name    = "_amazonses.${aws_ses_domain_identity.mail.domain}"
+  type    = "TXT"
+  ttl     = "600"
+  records = [aws_ses_domain_identity.mail.verification_token]
+}

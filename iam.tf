@@ -156,3 +156,28 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda_dynamodb.arn
 }
+
+data "aws_iam_policy_document" "lambda_ses" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail"
+    ]
+
+		resources = ["arn:aws:ses:*:*:*"]
+  }
+}
+
+resource "aws_iam_policy" "lambda_ses" {
+  name        = "lambda_ses"
+  path        = "/"
+  description = "IAM policy for connecting ses from a lambda"
+  policy      = data.aws_iam_policy_document.lambda_ses.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_ses" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_ses.arn
+}
