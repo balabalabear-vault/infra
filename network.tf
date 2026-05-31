@@ -45,33 +45,6 @@ resource "aws_route" "internet_access" {
 }
 
 
-resource "aws_eip" "trial" {
-  domain = "vpc"
-  tags = {
-    Name = "vault-prod-nat-gateway-eip"
-  }
-  depends_on = [aws_internet_gateway.gw]
-}
-
-resource "aws_nat_gateway" "gw" {
-  subnet_id     = aws_subnet.public[0].id
-  allocation_id = aws_eip.trial.id
-}
-
-# Create a new route table for the private subnets, make it route non-local traffic through the NAT gateway to the internet
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.gw.id
-  }
-}
-
-resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private[0].id
-  route_table_id = aws_route_table.private.id
-}
-
 # # Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
 # resource "aws_eip" "gw" {
 #     count      = var.az_count

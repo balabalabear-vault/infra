@@ -7,7 +7,9 @@ resource "aws_api_gateway_rest_api" "vault_frontend_api" {
   body = templatefile(
     "${path.module}/definitions/api_definition.tpl",
     {
-      lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.test_lambda.arn}/invocations"
+      test_lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.test_lambda.arn}/invocations",
+      get_comments_lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.get_comments_lambda.arn}/invocations",
+      post_comments_lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.comments_lambda.arn}/invocations"
     }
   )
 
@@ -30,7 +32,9 @@ resource "aws_api_gateway_deployment" "prod" {
       templatefile(
         "${path.module}/definitions/api_definition.tpl",
         {
-          lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.test_lambda.arn}/invocations"
+          test_lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.test_lambda.arn}/invocations",
+          get_comments_lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.get_comments_lambda.arn}/invocations",
+          post_comments_lambda_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.comments_lambda.arn}/invocations"
         }
       )
     )

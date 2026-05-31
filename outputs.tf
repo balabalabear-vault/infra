@@ -3,7 +3,7 @@ output "alb_hostname" {
 }
 
 output "lambda_url" {
-  value = aws_lambda_function_url.test_lambda
+  value = aws_lambda_function_url.comments_lambda
 }
 
 output "aws_ses_domain_identity_mail" {

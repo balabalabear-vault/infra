@@ -3,19 +3,19 @@ resource "aws_ecs_cluster" "vault_production" {
 
   setting {
     name  = "containerInsights"
-    value = "enabled"
+    value = "disabled"
   }
 }
 
 resource "aws_ecs_cluster_capacity_providers" "vault_production" {
   cluster_name = aws_ecs_cluster.vault_production.name
 
-  capacity_providers = ["FARGATE"]
+  capacity_providers = ["FARGATE_SPOT"]
 
   default_capacity_provider_strategy {
     base              = 1
     weight            = 100
-    capacity_provider = "FARGATE"
+    capacity_provider = "FARGATE_SPOT"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "vault_frontend_production" {
   container_definitions = jsonencode([
     {
       name      = "vault-front-end-production"
-      image     = "${aws_ecr_repository.vault_frontend.repository_url}:23fbed75b9bc871e28cb6e4b4af3ea23f281fba2"
+      image     = "${aws_ecr_repository.vault_frontend.repository_url}:latest"
       cpu       = 10
       memory    = 256
       essential = true
@@ -53,12 +53,11 @@ resource "aws_ecs_service" "vault_frontend_production" {
   name            = "vault-front-end-product"
   cluster         = aws_ecs_cluster.vault_production.id
   task_definition = aws_ecs_task_definition.vault_frontend_production.arn
-  desired_count   = var.app_count
-  launch_type     = "FARGATE"
+  desired_count = var.app_count
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = aws_subnet.private.*.id
+    subnets          = aws_subnet.public.*.id
     assign_public_ip = true
   }
 

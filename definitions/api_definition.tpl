@@ -5,14 +5,66 @@
     "version": "1.0"
   },
   "paths": {
-    "/path1": {
+    "/comments": {
       "get": {
-        "x-amazon-apigateway-integration": {
-          "httpMethod": "GET",
-          "type": "HTTP_PROXY",
-          "payloadFormatVersion": "1.0",
-          "uri": "https://ip-ranges.amazonaws.com/ip-ranges.json"
-        }
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/definitions/Comment"
+                  }
+                }
+              }
+            }
+          },
+          "x-amazon-apigateway-integration": {
+            "httpMethod": "POST",
+            "type": "aws_proxy",
+            "passthroughBehavior": "WHEN_NO_MATCH",
+            "payloadFormatVersion": "1.0",
+            "uri": "${get_comments_lambda_uri}"
+          }
+      },
+      "post": {
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "Comments",
+              "required": "true",
+              "schema": {
+                "$ref": "#/definitions/Comments"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "text/plain": {
+                  "schema": {
+                    "type": "string",
+                    "example": "pong"
+                  }
+                }
+              }
+            }
+          },
+          "x-amazon-apigateway-integration": {
+            "httpMethod": "POST",
+            "type": "aws_proxy",
+            "passthroughBehavior": "WHEN_NO_MATCH",
+            "payloadFormatVersion": "1.0",
+            "uri": "${post_comments_lambda_uri}",
+            "responses": {
+              "default": {
+                "statusCode": "200"
+              }
+            }
+          }
       }
     },
     "/contacts": {
@@ -28,36 +80,48 @@
                 "$ref": "#/definitions/Message"
               }
             }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "example": "pong"
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "text/plain": {
+                  "schema": {
+                    "type": "string",
+                    "example": "pong"
+                  }
                 }
               }
             }
-          }
-        },
-        "x-amazon-apigateway-integration": {
-          "httpMethod": "POST",
-          "type": "aws_proxy",
-          "passthroughBehavior": "WHEN_NO_MATCH",
-          "payloadFormatVersion": "1.0",
-          "uri": "${lambda_uri}",
-          "responses": {
-            "default": {
-              "statusCode": "200"
+          },
+          "x-amazon-apigateway-integration": {
+            "httpMethod": "POST",
+            "type": "aws_proxy",
+            "passthroughBehavior": "WHEN_NO_MATCH",
+            "payloadFormatVersion": "1.0",
+            "uri": "${test_lambda_uri}",
+            "responses": {
+              "default": {
+                "statusCode": "200"
+              }
             }
           }
-        }
       }
     }
   },
   "definitions": {
+    "Comment": {
+      "type": "array",
+      "items":{
+        "type": "object",
+        "properties": {
+          "created_at": { "type": "string" },                    
+          "username": { "type": "string"},                    
+          "profile_url": {"type": "string"},                    
+          "message": {"type": "string"}                    
+        }
+      }
+    },
     "Message": {
       "type": "object",
       "properties": {
