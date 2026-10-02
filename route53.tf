@@ -2,28 +2,36 @@ data "aws_route53_zone" "balabalabear" {
   name = "balabalabear.com"
 }
 
-resource "aws_route53_record" "com" {
+resource "aws_route53_record" "site" {
+  for_each = toset(flatten([
+    for name in ["balabalabear.com", "www.balabalabear.com"] : [
+      for type in ["A", "AAAA"] : "${name}|${type}"
+    ]
+  ]))
+
   zone_id = data.aws_route53_zone.balabalabear.zone_id
-  name    = "balabalabear.com"
-  type    = "A"
+  name    = split("|", each.key)[0]
+  type    = split("|", each.key)[1]
 
   alias {
-    name                   = aws_alb.main.dns_name
-    zone_id                = aws_alb.main.zone_id
-    evaluate_target_health = true
+    name                   = aws_cloudfront_distribution.site.domain_name
+    zone_id                = aws_cloudfront_distribution.site.hosted_zone_id
+    evaluate_target_health = false
   }
 }
 
-resource "aws_route53_record" "www" {
-  zone_id = data.aws_route53_zone.balabalabear.zone_id
-  name    = "www.balabalabear.com"
-  type    = "A"
-
-  alias {
-    name                   = aws_alb.main.dns_name
-    zone_id                = aws_alb.main.zone_id
-    evaluate_target_health = true
+resource "aws_route53_record" "site_acm" {
+  for_each = {
+    for dvo in aws_acm_certificate.site.domain_validation_options : dvo.domain_name => dvo
   }
+
+  zone_id = data.aws_route53_zone.balabalabear.zone_id
+  name    = each.value.resource_record_name
+  type    = each.value.resource_record_type
+  records = [each.value.resource_record_value]
+  ttl     = 60
+  # The old certificates may have created identical validation records by hand
+  allow_overwrite = true
 }
 
 resource "aws_route53_record" "api_acm" {
@@ -64,3 +72,4 @@ resource "aws_route53_record" "mail_from_txt" {
   ttl     = "600"
   records = [aws_ses_domain_identity.mail.verification_token]
 }
+
